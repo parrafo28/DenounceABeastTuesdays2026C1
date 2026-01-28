@@ -24,17 +24,36 @@ namespace DenounceBeasts.API.Controllers
             {
                 return NotFound();
             }
-            return Ok(municipality);
+            var result = new MunicipalityDto
+            {
+                Id = municipality.Id,
+                Name = municipality.Name,
+                PostalCode = municipality.PostalCode
+            };
+            return Ok(result);
         }
 
 
         [HttpGet]
         // public ActionResult<List<Municipality>> GetMunicipalities()
-        public IActionResult GetMunicipalities()
+        public IActionResult Get()
         {
-            
+            var municipalitiesDto = _municipalities.Select(m => new MunicipalityDto
+            {
+                Id = m.Id,
+                Name = m.Name,
+                PostalCode = m.PostalCode
+            }).ToList();
 
-            return Ok(_municipalities);
+
+            var municipalities = new List<MunicipalityDto>();
+            foreach (var item in _municipalities)
+            {
+                municipalities.Add(new MunicipalityDto { Id = item.Id, Name = item.Name, PostalCode = item.PostalCode });
+            }
+
+
+            return Ok(municipalitiesDto);
             // return (municipalities);
         }
 
@@ -77,20 +96,27 @@ namespace DenounceBeasts.API.Controllers
 
 
         [HttpPost] // POST: api/municipalities
-        public IActionResult Create(Municipality municipality)
+        public IActionResult Create(MunicipalityDto municipalityRequest)
         {
             // Validación manual adicional: nombre no vacío (alternativa a [Required]).
-            if (string.IsNullOrWhiteSpace(municipality.Name))
+            if (string.IsNullOrWhiteSpace(municipalityRequest.Name))
             {
                 return BadRequest("Name of municipality is required.");
             }
             int newId = _municipalities.Any() ? _municipalities.Max(m => m.Id) + 1 : 1;
-            municipality.Id = newId;
-            if (municipality.IsActive == false)
+            var municipality = new Municipality
             {
-                // Por lógica de negocio, podríamos decidir que todo nuevo municipio inicia activo.
-                municipality.IsActive = true;
-            }
+                Id = newId,
+                Name = municipalityRequest.Name,
+                PostalCode = municipalityRequest.PostalCode,
+                IsActive = true
+            };
+            //municipality.Id = newId;
+            //if (municipality.IsActive == false)
+            //{
+            //    // Por lógica de negocio, podríamos decidir que todo nuevo municipio inicia activo.
+            //    municipality.IsActive = true;
+            //}
 
             _municipalities.Add(municipality);
             // Devolver respuesta 201 Created con el recurso creado
@@ -99,14 +125,14 @@ namespace DenounceBeasts.API.Controllers
             ////    new { id = municipality.Id }, // Valores de ruta (el id del nuevo recurso)
             ////    municipality                  // El objeto creado (en el cuerpo de la respuesta)
             ////);
-            
-            return Ok(_municipalities);
-            
+
+            return Ok(new { Id = municipality.Id });
+
 
         }
 
         [HttpPut("{id}")] // PUT: api/municipalities/5
-        public IActionResult Update(int id, Municipality municipality)
+        public IActionResult Update(int id, MunicipalityDto municipalityRequest)
         {
             var existing = _municipalities.FirstOrDefault(m => m.Id == id);
             if (existing == null)
@@ -115,11 +141,10 @@ namespace DenounceBeasts.API.Controllers
             }
             // Opcional: validar que municipality.Id == id si quisiéramos forzar consistencia.
             // Actualizar propiedades (excepto el Id)
-            existing.Name = municipality.Name;
-            existing.PostalCode = municipality.PostalCode;
-            existing.IsActive = municipality.IsActive;
-            // Retornar 204 NoContent indicando que se realizó la operación sin devolver cuerpo.
-            return Ok(_municipalities);
+            existing.Name = municipalityRequest.Name;
+            existing.PostalCode = municipalityRequest.PostalCode;
+
+            return NoContent();
         }
 
         [HttpDelete("{id}")] // DELETE: api/municipalities/5
@@ -132,7 +157,8 @@ namespace DenounceBeasts.API.Controllers
             }
             _municipalities.Remove(existing);
             // Retornamos 204 NoContent para indicar que se eliminó correctamente (sin contenido).
-            return Ok(_municipalities);
+            return NoContent();
+
 
         }
 
