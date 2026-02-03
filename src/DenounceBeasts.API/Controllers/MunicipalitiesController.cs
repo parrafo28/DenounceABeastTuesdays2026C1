@@ -1,4 +1,7 @@
-﻿using DenounceBeasts.API.Models;
+﻿using DenounceBeasts.API.Data;
+using DenounceBeasts.API.Data.Entities;
+using DenounceBeasts.API.Models;
+using DenounceBeasts.API.Models.Dtos;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DenounceBeasts.API.Controllers
@@ -8,18 +11,17 @@ namespace DenounceBeasts.API.Controllers
     [Route("api/[controller]")]
     public class MunicipalitiesController : ControllerBase
     {
-        private static readonly List<Municipality> _municipalities = new List<Municipality>
-        {
-            new Municipality { Id = 1, Name = "Santo Domingo", PostalCode = "10101", IsActive = true },
-            new Municipality { Id = 2, Name = "Santiago de los Caballeros", PostalCode = "51000", IsActive = true },
-            new Municipality { Id = 3, Name = "Puerto Plata", PostalCode = "57000", IsActive = true }
-        };
+        private readonly DenounceBeastsContext _context;
 
+        public MunicipalitiesController(DenounceBeastsContext context)
+        {
+            this._context = context;
+        }
 
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
-            var municipality = _municipalities.FirstOrDefault(m => m.Id == id);
+            var municipality = _context.Municipalities.FirstOrDefault(m => m.Id == id);
             if (municipality == null)
             {
                 return NotFound();
@@ -33,98 +35,58 @@ namespace DenounceBeasts.API.Controllers
             return Ok(result);
         }
 
-
         [HttpGet]
-        // public ActionResult<List<Municipality>> GetMunicipalities()
         public IActionResult Get()
         {
-            var municipalitiesDto = _municipalities.Select(m => new MunicipalityDto
+            var municipalitiesDto = _context.Municipalities.Select(m => new MunicipalityDto
             {
                 Id = m.Id,
                 Name = m.Name,
                 PostalCode = m.PostalCode
             }).ToList();
 
-
-            var municipalities = new List<MunicipalityDto>();
-            foreach (var item in _municipalities)
-            {
-                municipalities.Add(new MunicipalityDto { Id = item.Id, Name = item.Name, PostalCode = item.PostalCode });
-            }
-
-
             return Ok(municipalitiesDto);
-            // return (municipalities);
         }
 
-        [HttpGet("getMunicipalities")]
-        // public ActionResult<List<Municipality>> GetMunicipalities()
-        public IActionResult GetMunicipalitiesx()
+        [HttpGet("with-sectors")]
+        public IActionResult GetAll()
         {
-            // Placeholder implementation
-            var municipalities = new List<Municipality>
-            {
-                new Municipality{ Id = 1, Name = "Springfield", PostalCode = "12345", IsActive = true },
-                new Municipality{ Id = 2, Name = "Shelbyville", PostalCode = "67890", IsActive = false }
-            };
+            var municipalitiesWithSectors = _context.Municipalities
+                .Where(m => m.IsActive)
+                .Select(m => new MunicipalitiesWithSector()
+                { 
+                    Id = m.Id,
+                    Name = m.Name,
+                    PostalCode = m.PostalCode,
+                    Sectors = m.Sectors
+                        .Where(s => s.IsActive)
+                        .Select(s => new SectorDto
+                        {
+                            Id = s.Id,
+                            Name = s.Name
+                        }).ToList()
+                }).ToList();
 
-            var muns = new List<Municipality>();
-            muns.Add(new Municipality { Id = 1, Name = "City A", PostalCode = "10001", IsActive = true });
-            muns.Add(new Municipality { Id = 1, Name = "City A", PostalCode = "10001", IsActive = true });
-
-            return Ok(municipalities);
-            // return (municipalities);
-        }
-        [HttpGet("/getMunicipalities")]
-        // public ActionResult<List<Municipality>> GetMunicipalities()
-        public IActionResult GetMunicipalitiesxc()
-        {
-            // Placeholder implementation
-            var municipalities = new List<Municipality>
-            {
-                new Municipality{ Id = 1, Name = "Springfield", PostalCode = "12345", IsActive = true },
-                new Municipality{ Id = 2, Name = "Shelbyville", PostalCode = "67890", IsActive = false }
-            };
-
-            var muns = new List<Municipality>();
-            muns.Add(new Municipality { Id = 1, Name = "City A", PostalCode = "10001", IsActive = true });
-            muns.Add(new Municipality { Id = 1, Name = "City A", PostalCode = "10001", IsActive = true });
-
-            return Ok(municipalities);
-            // return (municipalities);
+            return Ok(municipalitiesWithSectors);
         }
 
-
-        [HttpPost] // POST: api/municipalities
+        [HttpPost]
         public IActionResult Create(MunicipalityDto municipalityRequest)
         {
-            // Validación manual adicional: nombre no vacío (alternativa a [Required]).
             if (string.IsNullOrWhiteSpace(municipalityRequest.Name))
             {
                 return BadRequest("Name of municipality is required.");
             }
-            int newId = _municipalities.Any() ? _municipalities.Max(m => m.Id) + 1 : 1;
+
             var municipality = new Municipality
             {
-                Id = newId,
                 Name = municipalityRequest.Name,
                 PostalCode = municipalityRequest.PostalCode,
                 IsActive = true
             };
-            //municipality.Id = newId;
-            //if (municipality.IsActive == false)
-            //{
-            //    // Por lógica de negocio, podríamos decidir que todo nuevo municipio inicia activo.
-            //    municipality.IsActive = true;
-            //}
 
-            _municipalities.Add(municipality);
-            // Devolver respuesta 201 Created con el recurso creado
-            ////return CreatedAtAction(
-            ////    nameof(GetById),              // Nombre de la acción para generar el link de detalle
-            ////    new { id = municipality.Id }, // Valores de ruta (el id del nuevo recurso)
-            ////    municipality                  // El objeto creado (en el cuerpo de la respuesta)
-            ////);
+            _context.Add(municipality);
+            _context.SaveChanges();
 
             return Ok(new { Id = municipality.Id });
 
@@ -134,29 +96,31 @@ namespace DenounceBeasts.API.Controllers
         [HttpPut("{id}")] // PUT: api/municipalities/5
         public IActionResult Update(int id, MunicipalityDto municipalityRequest)
         {
-            var existing = _municipalities.FirstOrDefault(m => m.Id == id);
+            var existing = _context.Municipalities.FirstOrDefault(m => m.Id == id);
             if (existing == null)
             {
                 return NotFound();
             }
-            // Opcional: validar que municipality.Id == id si quisiéramos forzar consistencia.
-            // Actualizar propiedades (excepto el Id)
+
             existing.Name = municipalityRequest.Name;
             existing.PostalCode = municipalityRequest.PostalCode;
+
+            _context.Update(existing);
+            _context.SaveChanges();
 
             return NoContent();
         }
 
-        [HttpDelete("{id}")] // DELETE: api/municipalities/5
+        [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var existing = _municipalities.FirstOrDefault(m => m.Id == id);
+            var existing = _context.Municipalities.FirstOrDefault(m => m.Id == id);
             if (existing == null)
             {
                 return NotFound();
             }
-            _municipalities.Remove(existing);
-            // Retornamos 204 NoContent para indicar que se eliminó correctamente (sin contenido).
+            _context.Remove(existing);
+            _context.SaveChanges();
             return NoContent();
 
 

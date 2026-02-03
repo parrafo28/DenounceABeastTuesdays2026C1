@@ -1,7 +1,11 @@
+using DenounceBeasts.API.Data;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
-//TODO: Delete this
-var LicenceKey =  "YOUR_LICENCE_KEY_HERE";
+builder.Services.AddDbContext<DenounceBeastsContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DenounceBeastsConnection")));
+
 builder.Services.AddControllers();
  builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
