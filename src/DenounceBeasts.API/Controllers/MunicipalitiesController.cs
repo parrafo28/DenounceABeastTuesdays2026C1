@@ -1,4 +1,5 @@
-﻿using DenounceBeasts.API.Data;
+﻿using AutoMapper;
+using DenounceBeasts.API.Data;
 using DenounceBeasts.API.Data.Entities;
 using DenounceBeasts.API.Models;
 using DenounceBeasts.API.Models.Dtos;
@@ -12,40 +13,56 @@ namespace DenounceBeasts.API.Controllers
     public class MunicipalitiesController : ControllerBase
     {
         private readonly DenounceBeastsContext _context;
+        private readonly IMapper _mapper;
 
-        public MunicipalitiesController(DenounceBeastsContext context)
+        public MunicipalitiesController(DenounceBeastsContext context, IMapper mapper)
         {
             this._context = context;
+            this._mapper = mapper;
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        public ApiResponse<MunicipalityDto> GetById(int id)
         {
             var municipality = _context.Municipalities.FirstOrDefault(m => m.Id == id);
             if (municipality == null)
             {
-                return NotFound();
+                // return NotFound();
+                return ApiResponse<MunicipalityDto>.FailureResponse("Municipality not found.", 404);
             }
-            var result = new MunicipalityDto
-            {
-                Id = municipality.Id,
-                Name = municipality.Name,
-                PostalCode = municipality.PostalCode
-            };
-            return Ok(result);
+            //var result = new MunicipalityDto
+            //{
+            //    Id = municipality.Id,
+            //    Name = municipality.Name,
+            //    PostalCode = municipality.PostalCode
+            //};
+            var result = _mapper.Map<MunicipalityDto>(municipality);
+            //var response = new ApiResponse<MunicipalityDto>
+            //{
+            //    Success = true,
+            //    Message = "Municipality retrieved successfully.",
+            //    Data = result
+            //};
+           // var response2 = ApiResponse<MunicipalityDto>.SuccessResponse(result, "Municipality retrieved successfully.");
+            return ApiResponse<MunicipalityDto>.SuccessResponse(result, "Municipality retrieved successfully.");
+            //return Ok(result);
+          //  return Ok(response2);
         }
 
         [HttpGet]
         public IActionResult Get()
         {
-            var municipalitiesDto = _context.Municipalities.Select(m => new MunicipalityDto
-            {
-                Id = m.Id,
-                Name = m.Name,
-                PostalCode = m.PostalCode
-            }).ToList();
+            var list = _context.Municipalities.ToList();
 
-            return Ok(municipalitiesDto);
+            //var municipalitiesDto = _context.Municipalities.Select(m => new MunicipalityDto
+            //{
+            //    Id = m.Id,
+            //    Name = m.Name,
+            //    PostalCode = m.PostalCode
+            //}).ToList();
+            var response = _mapper.Map<List<MunicipalityDto>>(list);
+
+            return Ok(response);
         }
 
         [HttpGet("with-sectors")]
@@ -54,7 +71,7 @@ namespace DenounceBeasts.API.Controllers
             var municipalitiesWithSectors = _context.Municipalities
                 .Where(m => m.IsActive)
                 .Select(m => new MunicipalitiesWithSector()
-                { 
+                {
                     Id = m.Id,
                     Name = m.Name,
                     PostalCode = m.PostalCode,
@@ -78,13 +95,13 @@ namespace DenounceBeasts.API.Controllers
                 return BadRequest("Name of municipality is required.");
             }
 
-            var municipality = new Municipality
-            {
-                Name = municipalityRequest.Name,
-                PostalCode = municipalityRequest.PostalCode,
-                IsActive = true
-            };
-
+            //var municipality = new Municipality
+            //{
+            //    Name = municipalityRequest.Name,
+            //    PostalCode = municipalityRequest.PostalCode,
+            //    IsActive = true
+            //};
+            var municipality = _mapper.Map<Municipality>(municipalityRequest);
             _context.Add(municipality);
             _context.SaveChanges();
 
