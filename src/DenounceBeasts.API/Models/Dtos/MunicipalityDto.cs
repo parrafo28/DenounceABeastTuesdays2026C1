@@ -9,7 +9,6 @@ namespace DenounceBeasts.API.Models
         public string Name { get; set; } = string.Empty;
         [StringLength(20)]
         public string? PostalCode { get; set; }
-        //public bool IsActive { get; set; }
 
     }
 }

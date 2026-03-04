@@ -1,6 +1,6 @@
-﻿namespace DenounceBeasts.API.Data.Entities
+﻿namespace DenounceBeasts.Domain.Entities
 {
-    public class Status
+    public class ComplaintType
     {
         public int Id { get; set; }
         public string Name { get; set; }

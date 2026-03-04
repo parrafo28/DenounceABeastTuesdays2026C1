@@ -1,4 +1,4 @@
-﻿using DenounceBeasts.API.Data;
+﻿using DenounceBeasts.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

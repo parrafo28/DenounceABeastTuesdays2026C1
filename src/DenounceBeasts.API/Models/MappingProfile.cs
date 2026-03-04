@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using DenounceBeasts.API.Data.Entities;
+using DenounceBeasts.Domain.Entities;
 
 namespace DenounceBeasts.API.Models
 {
@@ -7,7 +7,7 @@ namespace DenounceBeasts.API.Models
     {
         public MappingProfile()
         {
-            CreateMap<Municipality, MunicipalityDto>().ReverseMap(); 
+            CreateMap<Municipality, MunicipalityDto>().ReverseMap();
             //CreateMap<Municipality, MunicipalityDto>()
             //    .ForMember( p=> p.PostalCode, opt => opt.MapFrom(src => src.PostalCode))
             //    .ReverseMap();

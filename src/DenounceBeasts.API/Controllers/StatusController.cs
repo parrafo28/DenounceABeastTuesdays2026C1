@@ -1,7 +1,7 @@
-﻿using DenounceBeasts.API.Data;
-using DenounceBeasts.API.Data.Entities;
-using DenounceBeasts.API.Models;
-using DenounceBeasts.API.Models.Dtos;
+﻿using DenounceBeasts.API.Models.Dtos;
+using DenounceBeasts.Domain.Entities;
+using DenounceBeasts.Infrastructure.Repositories;
+using DenounceBeasts.Persistence;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DenounceBeasts.API.Controllers
@@ -11,17 +11,17 @@ namespace DenounceBeasts.API.Controllers
     [Route("api/[controller]")]
     public class StatusController : ControllerBase
     {
-        private readonly DenounceBeastsContext _context;
+        private readonly GenericRepository<Status> _statusRepository;
 
-        public StatusController(DenounceBeastsContext context)
+        public StatusController(GenericRepository<Status> statusRepository)
         {
-            this._context = context;
+            this._statusRepository = statusRepository;
         }
 
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
-            var status = _context.Status.FirstOrDefault(m => m.Id == id);
+            var status = _statusRepository.GetById(id);
             if (status == null)
             {
                 return NotFound();
@@ -37,7 +37,7 @@ namespace DenounceBeasts.API.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            var statusDto = _context.Status.Select(m => new StatusDto
+            var statusDto = _statusRepository.GetAll().Select(m => new StatusDto
             {
                 Id = m.Id,
                 Name = m.Name
@@ -46,7 +46,7 @@ namespace DenounceBeasts.API.Controllers
             return Ok(statusDto);
         }
 
-     
+
 
         [HttpPost]
         public IActionResult Create(StatusDto statusRequest)
@@ -61,27 +61,25 @@ namespace DenounceBeasts.API.Controllers
                 Name = statusRequest.Name
             };
 
-            _context.Add(status);
-            _context.SaveChanges();
+            _statusRepository.Add(status);
 
             return Ok(new { Id = status.Id });
 
 
         }
 
-        [HttpPut("{id}")] // PUT: api/status/5
+        [HttpPut("{id}")] 
         public IActionResult Update(int id, StatusDto statusRequest)
         {
-            var existing = _context.Status.FirstOrDefault(m => m.Id == id);
+            var existing = _statusRepository.GetById(id);
             if (existing == null)
             {
                 return NotFound();
             }
 
-            existing.Name = statusRequest.Name; 
+            existing.Name = statusRequest.Name;
 
-            _context.Update(existing);
-            _context.SaveChanges();
+            _statusRepository.Update(existing);
 
             return NoContent();
         }
@@ -89,13 +87,12 @@ namespace DenounceBeasts.API.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var existing = _context.Status.FirstOrDefault(m => m.Id == id);
+            var existing = _statusRepository.GetById(id);
             if (existing == null)
             {
                 return NotFound();
             }
-            _context.Remove(existing);
-            _context.SaveChanges();
+            _statusRepository.Delete(id);
             return NoContent();
 
 

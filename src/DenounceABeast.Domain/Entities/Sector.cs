@@ -1,9 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DenounceBeasts.API.Data.Entities
+namespace DenounceBeasts.Domain.Entities
 {
-    //[Table("Sector")]
     public class Sector
     {
         [Key] 

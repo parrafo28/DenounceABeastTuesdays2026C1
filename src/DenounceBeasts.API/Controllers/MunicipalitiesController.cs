@@ -1,8 +1,9 @@
 ﻿using AutoMapper;
-using DenounceBeasts.API.Data;
-using DenounceBeasts.API.Data.Entities;
 using DenounceBeasts.API.Models;
 using DenounceBeasts.API.Models.Dtos;
+using DenounceBeasts.Domain.Entities;
+using DenounceBeasts.Infrastructure.Repositories;
+using DenounceBeasts.Persistence;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DenounceBeasts.API.Controllers
@@ -12,54 +13,45 @@ namespace DenounceBeasts.API.Controllers
     [Route("api/[controller]")]
     public class MunicipalitiesController : ControllerBase
     {
-        private readonly DenounceBeastsContext _context;
+        //private readonly DenounceBeastsContext _context;
         private readonly IMapper _mapper;
+        //private readonly MunicipalityRepository _municipalityRepository;
+        //private readonly SectorRepository _sectorRepository;
+        private readonly UnitOfWork _unitOfWork;
 
-        public MunicipalitiesController(DenounceBeastsContext context, IMapper mapper)
+        public MunicipalitiesController(DenounceBeastsContext context, IMapper mapper,
+            //MunicipalityRepository municipalityRepository,
+            //SectorRepository sectorRepository, 
+            UnitOfWork unitOfWork)
         {
-            this._context = context;
+            //this._context = context;
             this._mapper = mapper;
+            //this._municipalityRepository = municipalityRepository;
+            //this._sectorRepository = sectorRepository;
+            this._unitOfWork = unitOfWork;
         }
 
         [HttpGet("{id}")]
         public ApiResponse<MunicipalityDto> GetById(int id)
         {
-            var municipality = _context.Municipalities.FirstOrDefault(m => m.Id == id);
+            //var municipality = _municipalityRepository.GetById(id);
+            var municipality = _unitOfWork.MunicipalityRepository.GetById(id);
             if (municipality == null)
             {
-                // return NotFound();
                 return ApiResponse<MunicipalityDto>.FailureResponse("Municipality not found.", 404);
             }
-            //var result = new MunicipalityDto
-            //{
-            //    Id = municipality.Id,
-            //    Name = municipality.Name,
-            //    PostalCode = municipality.PostalCode
-            //};
+
             var result = _mapper.Map<MunicipalityDto>(municipality);
-            //var response = new ApiResponse<MunicipalityDto>
-            //{
-            //    Success = true,
-            //    Message = "Municipality retrieved successfully.",
-            //    Data = result
-            //};
-           // var response2 = ApiResponse<MunicipalityDto>.SuccessResponse(result, "Municipality retrieved successfully.");
             return ApiResponse<MunicipalityDto>.SuccessResponse(result, "Municipality retrieved successfully.");
-            //return Ok(result);
-          //  return Ok(response2);
+
         }
 
         [HttpGet]
         public IActionResult Get()
         {
-            var list = _context.Municipalities.ToList();
+            //var list = _municipalityRepository.GetAll();
+            var list = _unitOfWork.MunicipalityRepository.GetAll();
 
-            //var municipalitiesDto = _context.Municipalities.Select(m => new MunicipalityDto
-            //{
-            //    Id = m.Id,
-            //    Name = m.Name,
-            //    PostalCode = m.PostalCode
-            //}).ToList();
             var response = _mapper.Map<List<MunicipalityDto>>(list);
 
             return Ok(response);
@@ -68,8 +60,8 @@ namespace DenounceBeasts.API.Controllers
         [HttpGet("with-sectors")]
         public IActionResult GetAll()
         {
-            var municipalitiesWithSectors = _context.Municipalities
-                .Where(m => m.IsActive)
+            //var municipalitiesWithSectors = _municipalityRepository.GetMunicipalitiesWithSectors()
+            var municipalitiesWithSectors = _unitOfWork.MunicipalityRepository.GetMunicipalitiesWithSectors()
                 .Select(m => new MunicipalitiesWithSector()
                 {
                     Id = m.Id,
@@ -95,25 +87,62 @@ namespace DenounceBeasts.API.Controllers
                 return BadRequest("Name of municipality is required.");
             }
 
-            //var municipality = new Municipality
-            //{
-            //    Name = municipalityRequest.Name,
-            //    PostalCode = municipalityRequest.PostalCode,
-            //    IsActive = true
-            //};
             var municipality = _mapper.Map<Municipality>(municipalityRequest);
-            _context.Add(municipality);
-            _context.SaveChanges();
+            _unitOfWork.MunicipalityRepository.Add(municipality);
+            _unitOfWork.Complete();
 
+            return Ok(new { Id = municipality.Id });
+
+        }
+
+        [HttpPost]
+        [Route("create-with-sectors")]
+        public IActionResult CreateWithSectors(CreateMunicipalityWithSectors request)
+        {
+
+            if (string.IsNullOrWhiteSpace(request.Municipality.Name))
+            {
+                return BadRequest("Name of municipality is required.");
+            }
+            var municipality = new Municipality
+            {
+                Name = request.Municipality.Name,
+                PostalCode = request.Municipality.PostalCode,
+                //Sectors = request.Sectors.Select(s => new Sector
+                //{
+                //    Name = s.Name,
+                //    PostalCode = s.PostalCode,
+                //    IsActive = true
+                //}).ToList()
+            };
+            _unitOfWork.BeginTransaction();
+            //_municipalityRepository.Add(municipality);
+            _unitOfWork.MunicipalityRepository.Add(municipality);
+            foreach (var sectorDto in request.Sectors)
+            {
+                var sector = new Sector
+                {
+                    Name = sectorDto.Name,
+                    PostalCode = sectorDto.PostalCode,
+                    IsActive = true,
+                    MunicipalityId = municipality.Id
+                };
+                //_sectorRepository.AddSector(sector);
+                _unitOfWork.SectorRepository.AddSector(sector);
+            }
+            _unitOfWork.Complete();
+            _unitOfWork.CommitTransaction();    
+             
             return Ok(new { Id = municipality.Id });
 
 
         }
 
-        [HttpPut("{id}")] // PUT: api/municipalities/5
+        [HttpPut("{id}")]
         public IActionResult Update(int id, MunicipalityDto municipalityRequest)
         {
-            var existing = _context.Municipalities.FirstOrDefault(m => m.Id == id);
+            //var existing = _municipalityRepository.GetById(id);
+            var existing = _unitOfWork.MunicipalityRepository.GetById(id);
             if (existing == null)
             {
                 return NotFound();
@@ -122,8 +151,9 @@ namespace DenounceBeasts.API.Controllers
             existing.Name = municipalityRequest.Name;
             existing.PostalCode = municipalityRequest.PostalCode;
 
-            _context.Update(existing);
-            _context.SaveChanges();
+            //_municipalityRepository.Update(existing);
+            _unitOfWork.MunicipalityRepository.Update(existing);
+            _unitOfWork.Complete();
 
             return NoContent();
         }
@@ -131,16 +161,17 @@ namespace DenounceBeasts.API.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var existing = _context.Municipalities.FirstOrDefault(m => m.Id == id);
+            //var existing = _municipalityRepository.GetById(id);
+            var existing = _unitOfWork.MunicipalityRepository.GetById(id);
             if (existing == null)
             {
                 return NotFound();
             }
-            _context.Remove(existing);
-            _context.SaveChanges();
+            //_municipalityRepository.Delete(id);
+            _unitOfWork.MunicipalityRepository.Delete(id);
+            _unitOfWork.Complete();
+
             return NoContent();
-
-
         }
 
     }

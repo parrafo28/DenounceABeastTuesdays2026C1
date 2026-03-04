@@ -1,5 +1,5 @@
-﻿using DenounceBeasts.API.Data.Entities;
-using DenounceBeasts.API.Models;
+﻿using DenounceBeasts.API.Models;
+using DenounceBeasts.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DenounceBeasts.API.Controllers
@@ -41,7 +41,7 @@ namespace DenounceBeasts.API.Controllers
             return Ok(sectorsDto);
         }
 
-        [HttpPost] // POST: api/sectors
+        [HttpPost]
         public IActionResult Create(Sector sector)
         {
             if (string.IsNullOrWhiteSpace(sector.Name))
@@ -62,7 +62,7 @@ namespace DenounceBeasts.API.Controllers
 
         }
 
-        [HttpPut("{id}")] // PUT: api/sectors/5
+        [HttpPut("{id}")]
         public IActionResult Update(int id, Sector sector)
         {
             var existing = _sectors.FirstOrDefault(m => m.Id == id);
@@ -76,7 +76,7 @@ namespace DenounceBeasts.API.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{id}")] // DELETE: api/sectors/5
+        [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
             var existing = _sectors.FirstOrDefault(m => m.Id == id);
