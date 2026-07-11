@@ -1,4 +1,6 @@
-﻿namespace DenounceBeasts.API.Models.Dtos
+﻿using DenounceBeasts.Application.Dtos.Sectors;
+
+namespace DenounceBeasts.Application.Dtos.Municipalities
 {
     public class MunicipalitiesWithSector
     {

@@ -1,4 +1,4 @@
-﻿namespace DenounceBeasts.API.Models.Dtos
+﻿namespace DenounceBeasts.Application.Responses
 {
     public class ApiResponse<T>
      where T : class
@@ -8,7 +8,7 @@
         public bool Success { get; set; }
         public int StatusCode { get; set; }
 
-        public static ApiResponse<T> SuccessResponse(T data, string message = null, int statusCode = 200)
+        public static ApiResponse<T> SuccessResponse(T? data=null, string message = null, int statusCode = 200)
         {
             return new ApiResponse<T>
             {

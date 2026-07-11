@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using DenounceBeasts.Application.Dtos.Municipalities;
+using DenounceBeasts.Application.Dtos.Sectors;
 using DenounceBeasts.Domain.Entities;
 
-namespace DenounceBeasts.API.Models
+namespace DenounceBeasts.Application.Dtos
 {
     public class MappingProfile : Profile
     {
@@ -13,7 +15,7 @@ namespace DenounceBeasts.API.Models
             //    .ReverseMap();
             //CreateMap<MunicipalityDto, Municipality>();
 
-            CreateMap<Sector, SectorDto>().ReverseMap();
+            CreateMap<DenounceBeasts.Domain.Entities.Sector, SectorDto>().ReverseMap();
             //CreateMap<SectorDto, Sector>();
         }
     }

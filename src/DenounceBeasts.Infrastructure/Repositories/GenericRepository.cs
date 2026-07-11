@@ -1,8 +1,9 @@
-﻿using DenounceBeasts.Persistence;
+﻿using DenounceBeasts.Domain.Core;
+using DenounceBeasts.Persistence;
 
 namespace DenounceBeasts.Infrastructure.Repositories
 {
-    public class GenericRepository<T> where T : class
+    public class GenericRepository<T> where T : BaseEntity
     {
         private readonly DenounceBeastsContext _context;
 
@@ -13,7 +14,9 @@ namespace DenounceBeasts.Infrastructure.Repositories
 
         public T GetById(int id)
         {
-            return _context.Set<T>().Find(id);
+            //return _context.Set<T>().Find(id);
+            return _context.Set<T>().FirstOrDefault(e => e.Id == id && !e.IsDeleted);
+
         }
 
         public List<T> GetAll()

@@ -1,7 +1,6 @@
-﻿using DenounceBeasts.API.Models.Dtos;
+﻿using DenounceBeasts.Application.Dtos.Sectors;
 using DenounceBeasts.Domain.Entities;
 using DenounceBeasts.Infrastructure.Repositories;
-using DenounceBeasts.Persistence;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DenounceBeasts.API.Controllers
@@ -68,7 +67,7 @@ namespace DenounceBeasts.API.Controllers
 
         }
 
-        [HttpPut("{id}")] 
+        [HttpPut("{id}")]
         public IActionResult Update(int id, StatusDto statusRequest)
         {
             var existing = _statusRepository.GetById(id);

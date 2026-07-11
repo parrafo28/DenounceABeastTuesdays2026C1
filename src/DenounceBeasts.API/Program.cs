@@ -1,4 +1,6 @@
-using DenounceBeasts.API.Models;
+using DenounceBeasts.Application;
+using DenounceBeasts.Application.Dtos;
+using DenounceBeasts.Application.Services;
 using DenounceBeasts.Domain.Entities;
 using DenounceBeasts.Infrastructure.Repositories;
 using DenounceBeasts.Persistence;
@@ -18,8 +20,7 @@ builder.Services.AddAutoMapper(cfg =>
     cfg.AddProfile<MappingProfile>();
 }, typeof(Program).Assembly);
 
-//var automapperLicence = builder.Configuration.GetSection("KeysConfigurations:AutomapperLicenceKey").Value;
-//builder.Services.AddAutoMapper(cfg => cfg.LicenseKey = automapperLicence, typeof(MappingProfile));
+builder.Services.AddTransient<IDemographyService, DemographyLocalService>();
 
 builder.Services.AddTransient<MunicipalityRepository>();
 builder.Services.AddTransient<SectorRepository>();

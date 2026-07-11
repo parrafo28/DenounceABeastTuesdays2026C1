@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DenounceBeasts.Infrastructure.Repositories
 {
-    public class MunicipalityRepository: GenericRepository<Municipality>
+    public class MunicipalityRepository: GenericRepository<Sector>
     {
         private readonly DenounceBeastsContext _context;
 

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.2.11415.280 d18.0
+VisualStudioVersion = 18.2.11415.280
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DenounceBeasts.API", "DenounceBeasts.API\DenounceBeasts.API.csproj", "{25C18B05-9467-46D0-8E5B-66E744B565BB}"
 EndProject
@@ -10,6 +10,16 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DenounceBeasts.Persistence", "DenounceBeasts.Persistence\DenounceBeasts.Persistence.csproj", "{78B73AD3-8267-4B51-87B5-6F5BF0A4E3CE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DenounceBeasts.Infrastructure", "DenounceBeasts.Infrastructure\DenounceBeasts.Infrastructure.csproj", "{9CA3C891-0F1E-425F-A483-7AD63FDE4ACC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DenounceBeasts.Application", "DenounceBeasts.Application\DenounceBeasts.Application.csproj", "{B23C4650-32E2-46EC-99DB-176A47F024D2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{C641F412-BBE7-44B6-B66F-CBAA5F984CD1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Business", "Business", "{5279780D-04CC-4149-A014-61A4E88E8FC7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentation", "{7CB20B9E-6B26-4B46-90D7-F33EBA8351B2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DenounceBeasts.Common", "DenounceBeasts.Common\DenounceBeasts.Common.csproj", "{73916694-44F5-4C71-B50F-8BF34BA1FBD1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,9 +43,24 @@ Global
 		{9CA3C891-0F1E-425F-A483-7AD63FDE4ACC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9CA3C891-0F1E-425F-A483-7AD63FDE4ACC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9CA3C891-0F1E-425F-A483-7AD63FDE4ACC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B23C4650-32E2-46EC-99DB-176A47F024D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B23C4650-32E2-46EC-99DB-176A47F024D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B23C4650-32E2-46EC-99DB-176A47F024D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B23C4650-32E2-46EC-99DB-176A47F024D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{73916694-44F5-4C71-B50F-8BF34BA1FBD1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73916694-44F5-4C71-B50F-8BF34BA1FBD1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73916694-44F5-4C71-B50F-8BF34BA1FBD1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73916694-44F5-4C71-B50F-8BF34BA1FBD1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{25C18B05-9467-46D0-8E5B-66E744B565BB} = {7CB20B9E-6B26-4B46-90D7-F33EBA8351B2}
+		{5E32CB63-6868-4EC0-A485-5ACB815EFD64} = {C641F412-BBE7-44B6-B66F-CBAA5F984CD1}
+		{78B73AD3-8267-4B51-87B5-6F5BF0A4E3CE} = {C641F412-BBE7-44B6-B66F-CBAA5F984CD1}
+		{9CA3C891-0F1E-425F-A483-7AD63FDE4ACC} = {C641F412-BBE7-44B6-B66F-CBAA5F984CD1}
+		{B23C4650-32E2-46EC-99DB-176A47F024D2} = {5279780D-04CC-4149-A014-61A4E88E8FC7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DB50A95A-8F8D-4511-9C39-8B8878E871E2}

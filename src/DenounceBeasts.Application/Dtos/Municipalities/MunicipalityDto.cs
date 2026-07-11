@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace DenounceBeasts.API.Models
+namespace DenounceBeasts.Application.Dtos.Municipalities
 {
     public class MunicipalityDto
     {

@@ -1,6 +1,6 @@
-﻿namespace DenounceBeasts.API.Models.Dtos
+﻿namespace DenounceBeasts.Application.Dtos
 {
-    public class StatusDto
+    public class ComplaintTypeDto
     {
         public int Id { get; set; }
         public string Name { get; set; }
